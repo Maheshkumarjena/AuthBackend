@@ -6,58 +6,52 @@ import jwt from 'jsonwebtoken';
 const router = express.Router(); 
 
 
-
 router.post('/signup', async (req, res) => {
-    try {
-      // Check the request body content
-      console.log(req.body);
-  
-        const userName=req.body.user.name;
-        const email=req.body.user.email;
-        const password=req.body.user.password;
-  
-      console.log("userName",userName);
-      console.log(email,"email");
-      console.log(password,"password");
+  try {
+    // Check the request body content
+    console.log(req.body);
 
-      if( !userName 
-        || !email 
-        || !password ) {
-            return res.status(400).json({ message: 'Please enter all fields' });
-        }
-      
+    const userName = req.body.user.name;
+    const email = req.body.user.email;
+    const password = req.body.user.password;
 
-      // Check if the user already exists
-      const existingUsername = await User.findOne({ userName });
-      const existingUser = await User.findOne({ email });
-      console.log("Existing user:", existingUser);
-      if (existingUser) {
-        return res.status(400).json({ message: 'User already exists' });
-      }
-  
-      else if (existingUsername) {
-        return res.status(400).json({ message: 'choose a different userName' });
-      }
-  
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 5);
-  
-      // Create a new user
-      const newUser = new User({
-        userName:userName,
-        email,
-        password: hashedPassword,
-      });
-  
-      // Save the new user to the database
-      await newUser.save();
-  
-      res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-      console.error("Error during signup:", error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.log("userName", userName);
+    console.log(email, "email");
+    console.log(password, "password");
+
+    if (!userName || !email || !password) {
+      return res.status(400).json({ message: 'Please enter all fields' });
     }
-  });
+
+    // Check if the user already exists
+    const existingUsername = await User.findOne({ userName });
+    const existingUser = await User.findOne({ email });
+    console.log("Existing user:", existingUser);
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    } else if (existingUsername) {
+      return res.status(400).json({ message: 'Choose a different userName' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 5);
+
+    // Create a new user
+    const newUser = new User({
+      userName: userName,
+      email,
+      password: hashedPassword,
+    });
+
+    // Save the new user to the database
+    await newUser.save();
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error("Error during signup:", error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 
