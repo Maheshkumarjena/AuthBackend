@@ -6,10 +6,15 @@ import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-  
+
+
+const corsOptions = {
+  origin: 'http://localhost:3001',
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
 dotenv.config();
 const app=express();
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 //The below line would convert the data that we pass form the frontend to json format ..
 app.use(express.json());

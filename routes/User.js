@@ -6,6 +6,20 @@ import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
+const verifyUser = async (req,res,next)=>{
+  try{
+    const token =req.cookies.token;
+    if(!token){
+      return res.json({status:false,message:"no token"});
+    }
+    const decoded= await jwt.verify(token,process.env.KEY);
+    next()
+  }
+  catch(err){
+    return res.json(err,"error from server");
+  }
+}
+
 
 // signup router
 router.post('/signup', async (req, res) => {
@@ -150,6 +164,8 @@ router.post('/forgotpassword', async (req, res) => {
 });
 
 
+
+// Resetpassword router
 router.put('/resetpassword/:token', async (req, res) => {
   const token = req.params.token; 
   const { password } = req.body;
@@ -165,6 +181,13 @@ router.put('/resetpassword/:token', async (req, res) => {
     return res.json({ status: false, message: "invalid token" });
   }
 });
+
+
+router.get('/verify',verifyUser,(req,res,next)=>{
+  return res.json({status :true , message : "authorized"})
+})
+
+
 
 
 export default router;
