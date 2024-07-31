@@ -9,6 +9,8 @@ const router = express.Router();
 const verifyUser = async (req,res,next)=>{
   try{
     const token =req.cookies.token;
+    
+    console.log(token);
     if(!token){
       return res.json({status:false,message:"no token"});
     }
@@ -106,8 +108,9 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ userName: user.userName }, process.env.KEY, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true, maxAge: 360000 });
-    return res.json({ status: true, message: 'Login successful' });
+    res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie('user', user, { httpOnly: true, maxAge: 3600000 });
+    return res.json({ status: true, message: 'Login successful' ,user:user });
 
   } catch (error) {
     console.error('Error during login:', error);
@@ -183,8 +186,21 @@ router.put('/resetpassword/:token', async (req, res) => {
 });
 
 
+// router to verify the user and give access to the dashboard , the "verifyUser" function has been defined at the top of the file..
+
 router.get('/verify',verifyUser,(req,res,next)=>{
-  return res.json({status :true , message : "authorized"})
+  // console.log(email);
+  const username=req.cookies.user.userName;
+    const email=req.cookies.user.email;
+  return res.json({status :true , message : "authorized",username:username , email:email})
+
+})
+
+
+router.post('/logout',(req,res)=>{
+  res.clearCookie('token');
+  res.clearCookie('user');
+  return res.json({status:true});
 })
 
 
